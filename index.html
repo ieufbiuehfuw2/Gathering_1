@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gathering I Photoshoot</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            background: #1a1a1a;
+            color: #ccc;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            overflow: hidden;
+        }
+        #viewer {
+            width: 100vw;
+            height: 100vh;
+            background: #000;
+        }
+        .info {
+            position: absolute;
+            bottom: 10px;
+            left: 10px;
+            background: rgba(0,0,0,0.7);
+            padding: 8px 12px;
+            border-radius: 4px;
+            font-size: 12px;
+            z-index: 100;
+            pointer-events: none;
+        }
+    </style>
+</head>
+<body>
+    <div id="viewer"></div>
+
+    <script src="./openseadragon.min.js"></script>
+    <script>
+        const config = {
+            image: "./stitched.png",
+        };
+
+        const viewer = OpenSeadragon({
+            id: "viewer",
+            prefixUrl: "./images/",
+            showNavigator: true,
+            navigatorPosition: "BOTTOM_LEFT",
+            navigatorWidth: 200,
+            navigatorHeight: 120,
+            tileSources: {
+                type: 'image',
+                url: config.image
+            },
+            zoomPerClick: 2,
+            zoomPerScroll: 1.2,
+            gestureSettingsMouse: {
+                clickToZoom: true,
+                dblClickToZoom: true,
+                scrollToZoom: true,
+                pinchToZoom: true
+            },
+            maxZoomPixelRatio: 2,
+            minZoomImageRatio: 0.1,
+
+            tweeningTime: 0.2,
+            tweeningDuration: 0.3,
+            showNavigationControl: true,
+            showZoomControl: true,
+            showHomeControl: true,
+            showFullPageControl: true,
+            showSequenceControl: false,
+            preserveViewport: false,
+        });
+
+        viewer.addHandler('page', function(event) {
+            document.getElementById('info').textContent = `Page: ${event.page + 1}`;
+        });
+
+        document.addEventListener('keydown', function(e) {
+            switch(e.key) {
+                case '+':
+                case '=':
+                    viewer.viewport.zoomBy(1.2);
+                    viewer.viewport.applyConstraints();
+                    e.preventDefault();
+                    break;
+                case '-':
+                    viewer.viewport.zoomBy(0.8);
+                    viewer.viewport.applyConstraints();
+                    e.preventDefault();
+                    break;
+                case '0':
+                    viewer.viewport.goHome();
+                    e.preventDefault();
+                    break;
+                case 'f':
+                    viewer.viewport.fitBounds(viewer.source.getNaturalBounds().clone());
+                    e.preventDefault();
+                    break;
+            }
+        });
+
+        viewer.addHandler('open-failed', function(event) {
+            document.getElementById('info').textContent = 'Failed to download!';
+            console.error('OpenSeadragon error:', event);
+        });
+    </script>
+</body>
+</html>

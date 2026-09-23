@@ -1,1 +1,1 @@
-# Gathering_1
+Rare clan photoshoot - Gathering I
